@@ -8,7 +8,7 @@
         :root {
             --primary: #2c2c2c;
             --secondary: #e0ddd7;
-            --accent: #f2745f;
+            --accent: #007bff; 
             --whatsapp: #25D366;
             --light-bg: #f4f3f0;
             --white: #FFFFFF;
@@ -42,8 +42,8 @@
         .section-title::after { content: ''; width: 60px; height: 4px; background: var(--accent); position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); }
 
         .btn { padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer; font-weight: 700; text-decoration: none; display: inline-block; transition: 0.4s; font-size: 14px; }
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(242, 116, 95, 0.3); }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(242, 116, 95, 0.4); }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4); background: #0056b3; }
         .btn-outline { border: 1px solid #ccc; color: var(--primary); background: var(--secondary); }
 
         .about-flex { display: flex; align-items: center; gap: 50px; flex-wrap: wrap; }
@@ -51,12 +51,11 @@
         .about-image { flex: 1; min-width: 300px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
         .about-image img { width: 100%; display: block; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
         .card { background: var(--secondary); padding: 40px; border-radius: 20px; text-align: center; transition: 0.3s; border: none; }
         .card:hover { transform: translateY(-10px); background: #d6d2cb; }
         .card h3 { color: var(--primary); margin-bottom: 15px; }
 
-        /* Estilos del Slider Horizontal */
         .slider-container { width: 100%; overflow: hidden; background: var(--white); padding: 40px 0; }
         .slider-track { display: flex; width: calc(250px * 12); animation: scroll 30s linear infinite; gap: 20px; }
         .slider-track:hover { animation-play-state: paused; }
@@ -101,7 +100,6 @@
             <a href="#contact" data-translate="nav-contact">Contacto</a>
             <button class="btn btn-outline" style="padding: 5px 15px; border-radius: 5px; font-size: 12px;" onclick="toggleLanguage()" id="langBtn">English</button>
         </nav>
-        <button class="btn btn-primary" onclick="openBooking()" data-translate="btn-book">Reservar Cita</button>
     </header>
 
     <section class="hero">
@@ -129,16 +127,16 @@
             <h2 class="section-title" data-translate="services-title">Nuestros Servicios</h2>
             <div class="grid">
                 <div class="card">
-                    <h3 data-translate="ser-1-t">🦷 Implantes Dentales</h3>
-                    <p data-translate="ser-1-p">Recupera la estética y función masticatoria con materiales de alta gama.</p>
+                    <h3 data-translate="ser-1-t">🪥 Odontología General</h3>
+                    <p data-translate="ser-1-p">Profilaxis (limpieza), extracciones, resinas y salud bucal preventiva.</p>
                 </div>
                 <div class="card">
-                    <h3 data-translate="ser-2-t">✨ Estética Dental</h3>
-                    <p data-translate="ser-2-p">Diseño de sonrisa, carillas y blanqueamiento láser profesional.</p>
+                    <h3 data-translate="ser-2-t">🦷 Ortodoncia</h3>
+                    <p data-translate="ser-2-p">Brackets metálicos y estéticos para alinear tu sonrisa de forma perfecta.</p>
                 </div>
                 <div class="card">
-                    <h3 data-translate="ser-3-t">🚑 Urgencias 24/7</h3>
-                    <p data-translate="ser-3-p">Atención inmediata para traumas y dolores agudos.</p>
+                    <h3 data-translate="ser-4-t">💎 Retenedores</h3>
+                    <p data-translate="ser-4-p">Mantén tu sonrisa alineada después de los brackets con retenedores de alta calidad.</p>
                 </div>
             </div>
         </div>
@@ -148,16 +146,16 @@
         <div class="slider-track">
             <div class="slide"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400" alt="Consulta"></div>
             <div class="slide"><img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400" alt="Equipo"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Blanqueamiento"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Implante"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Radiografía"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Laboratorio"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Limpieza"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Resina"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Ortodoncia"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Radiografía"></div>
             <div class="slide"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400" alt="Consulta"></div>
             <div class="slide"><img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400" alt="Equipo"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Blanqueamiento"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Implante"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Radiografía"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Laboratorio"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Limpieza"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Resina"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Ortodoncia"></div>
+            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Radiografía"></div>
         </div>
     </div>
 
@@ -173,7 +171,6 @@
                 <h4 data-translate="f-hours">Horarios</h4>
                 <p data-translate="h-week">Lunes - Viernes: 8am - 7pm</p>
                 <p data-translate="h-sat">Sábados: 9am - 2pm</p>
-                <p style="color:var(--accent); font-weight: bold;" data-translate="h-urg">Emergencias: 24 Horas</p>
             </div>
             <div class="footer-col">
                 <h4 data-translate="f-links">Enlaces</h4>
@@ -209,10 +206,10 @@
 
                 <label data-translate="m-service">Servicio:</label>
                 <select id="serviceSelect">
-                    <option value="Limpieza" data-translate="opt-1">Limpieza General</option>
-                    <option value="Implantes" data-translate="opt-2">Implantes Dentales</option>
-                    <option value="Estética" data-translate="opt-3">Estética Dental</option>
-                    <option value="Urgencia" data-translate="opt-4">Urgencia / Dolor</option>
+                    <option value="Limpieza / Profilaxis" data-translate="opt-1">Limpieza / Profilaxis</option>
+                    <option value="Evaluación Brackets" data-translate="opt-2">Evaluación Brackets</option>
+                    <option value="Retenedores" data-translate="opt-4">Retenedores</option>
+                    <option value="Odontología General" data-translate="opt-3">Odontología General</option>
                 </select>
 
                 <div class="form-row">
@@ -245,19 +242,19 @@
                 "btn-book-hero": "Agendar Mi Cita Ahora", "about-title": "Sobre Nosotros",
                 "about-p1": "En ODONTOCID, nos dedicamos a transformar vidas a través de la salud bucal. Somos un equipo de profesionales comprometidos con la excelencia, utilizando tecnología de punta en Santo Domingo Este.",
                 "about-p2": "Nuestra misión es brindar una experiencia dental sin dolor, basada en la confianza y resultados estéticos duraderos para toda la familia.",
-                "services-title": "Nuestros Servicios", "ser-1-t": "🦷 Implantes Dentales",
-                "ser-1-p": "Recupera la estética y función masticatoria con materiales de alta gama.",
-                "ser-2-t": "✨ Estética Dental", "ser-2-p": "Diseño de sonrisa, carillas y blanqueamiento láser profesional.",
-                "ser-3-t": "🚑 Urgencias 24/7", "ser-3-p": "Atención inmediata para traumas y dolores agudos.",
+                "services-title": "Nuestros Servicios", 
+                "ser-1-t": "🪥 Odontología General", "ser-1-p": "Profilaxis (limpieza), extracciones, resinas y salud bucal preventiva.",
+                "ser-2-t": "🦷 Ortodoncia", "ser-2-p": "Brackets metálicos y estéticos para alinear tu sonrisa de forma perfecta.",
+                "ser-4-t": "💎 Retenedores", "ser-4-p": "Mantén tu sonrisa alineada después de los brackets con retenedores de alta calidad.",
                 "f-contact": "Contacto", "f-hours": "Horarios", "h-week": "Lunes - Viernes: 8am - 7pm",
-                "h-sat": "Sábados: 9am - 2pm", "h-urg": "Emergencias: 24 Horas", "f-links": "Enlaces",
+                "h-sat": "Sábados: 9am - 2pm", "f-links": "Enlaces",
                 "f-gps": "Cómo llegar (GPS)", "f-rights": "Todos los derechos reservados.",
                 "m-title": "Agendar Cita", "m-doctor": "Seleccione Doctor(a):", "m-service": "Servicio:",
                 "m-date": "Fecha:", "m-time": "Hora:", "m-name-ph": "Primer nombre y apellidos",
                 "m-phone-ph": "WhatsApp (000) 000-0000", "m-id-ph": "000-0000000-0",
                 "m-name-label": "Nombre Completo:", "m-phone-label": "WhatsApp:", "m-id-label": "Cédula:",
                 "m-btn": "Confirmar y Enviar", "m-cancel": "Cancelar", "s-title": "¡Enviado!", "s-p": "Cerrando ventana...",
-                "opt-1": "Limpieza General", "opt-2": "Implantes Dentales", "opt-3": "Estética Dental", "opt-4": "Urgencia / Dolor",
+                "opt-1": "Limpieza / Profilaxis", "opt-2": "Evaluación Brackets", "opt-3": "Odontología General", "opt-4": "Retenedores",
                 "ws-patient": "Paciente", "ws-id": "Cédula", "ws-doctor": "Doctor", "ws-service": "Servicio", "ws-date": "Fecha", "ws-time": "Hora"
             },
             en: {
@@ -266,19 +263,19 @@
                 "btn-book-hero": "Book My Appointment Now", "about-title": "About Us",
                 "about-p1": "At ODONTOCID, we are dedicated to transforming lives through oral health. We are a team of professionals committed to excellence, using cutting-edge technology in Santo Domingo Este.",
                 "about-p2": "Our mission is to provide a pain-free dental experience, based on trust and lasting aesthetic results for the whole family.",
-                "services-title": "Our Services", "ser-1-t": "🦷 Dental Implants",
-                "ser-1-p": "Restore aesthetics and chewing function with high-end materials.",
-                "ser-2-t": "✨ Cosmetic Dentistry", "ser-2-p": "Smile design, veneers, and professional laser whitening.",
-                "ser-3-t": "🚑 24/7 Emergencies", "ser-3-p": "Immediate care for trauma and acute pain.",
+                "services-title": "Our Services", 
+                "ser-1-t": "🪥 General Dentistry", "ser-1-p": "Prophylaxis (cleaning), extractions, fillings, and preventive oral health.",
+                "ser-2-t": "🦷 Orthodontics", "ser-2-p": "Metal and aesthetic brackets to align your smile perfectly.",
+                "ser-4-t": "💎 Retainers", "ser-4-p": "Keep your smile aligned after brackets with high-quality retainers.",
                 "f-contact": "Contact", "f-hours": "Working Hours", "h-week": "Mon - Fri: 8am - 7pm",
-                "h-sat": "Saturdays: 9am - 2pm", "h-urg": "Emergencias: 24 Hours", "f-links": "Links",
+                "h-sat": "Saturdays: 9am - 2pm", "f-links": "Links",
                 "f-gps": "Get Directions (GPS)", "f-rights": "All rights reserved.",
                 "m-title": "Book Appointment", "m-doctor": "Select Doctor:", "m-service": "Service:",
                 "m-date": "Date:", "m-time": "Time:", "m-name-ph": "First name and last names",
                 "m-phone-ph": "WhatsApp (000) 000-0000", "m-id-ph": "000-0000000-0",
                 "m-name-label": "Full Name:", "m-phone-label": "WhatsApp:", "m-id-label": "ID/SSN:",
                 "m-btn": "Confirm & Send", "m-cancel": "Cancel", "s-title": "Sent!", "s-p": "Closing window...",
-                "opt-1": "General Cleaning", "opt-2": "Dental Implants", "opt-3": "Cosmetic Dentistry", "opt-4": "Emergency / Pain",
+                "opt-1": "Cleaning / Prophylaxis", "opt-2": "Brackets Evaluation", "opt-3": "General Dentistry", "opt-4": "Retainers",
                 "ws-patient": "Patient", "ws-id": "ID", "ws-doctor": "Doctor", "ws-service": "Service", "ws-date": "Date", "ws-time": "Time"
             }
         };
