@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ODONTOCID | Creando sonrisas que inspiran</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <style>
         :root {
             --primary: #2c2c2c;
@@ -24,7 +28,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
         }
         .logo { font-size: 1.6rem; font-weight: 800; color: var(--white); text-decoration: none; letter-spacing: 1px; }
-        .nav-links { display: flex; align-items: center; gap: 25px; }
+        .nav-links { display: flex; align-items: center; gap: 15px; }
         .nav-links a { text-decoration: none; color: #ccc; font-weight: 500; transition: 0.3s; font-size: 14px; }
         .nav-links a:hover { color: var(--white); }
 
@@ -46,26 +50,39 @@
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4); background: #0056b3; }
         .btn-outline { border: 1px solid #ccc; color: var(--primary); background: var(--secondary); }
 
+        #aboutContent {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, opacity 0.5s ease;
+            opacity: 0;
+        }
+        #aboutContent.show {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 30px;
+        }
+
         .about-flex { display: flex; align-items: center; gap: 50px; flex-wrap: wrap; }
         .about-text { flex: 1; min-width: 300px; }
         .about-image { flex: 1; min-width: 300px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
         .about-image img { width: 100%; display: block; }
 
+        .mv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 50px; }
+        .mv-card { 
+            padding: 40px; 
+            border-radius: 20px; 
+            background: var(--white); 
+            border: 2px solid var(--secondary);
+            transition: 0.3s;
+            text-align: left;
+        }
+        .mv-card h3 { color: var(--accent); margin-bottom: 15px; font-size: 1.5rem; text-transform: uppercase; }
+        .mv-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
         .card { background: var(--secondary); padding: 40px; border-radius: 20px; text-align: center; transition: 0.3s; border: none; }
         .card:hover { transform: translateY(-10px); background: #d6d2cb; }
         .card h3 { color: var(--primary); margin-bottom: 15px; }
-
-        .slider-container { width: 100%; overflow: hidden; background: var(--white); padding: 40px 0; }
-        .slider-track { display: flex; width: calc(250px * 12); animation: scroll 30s linear infinite; gap: 20px; }
-        .slider-track:hover { animation-play-state: paused; }
-        .slide { width: 250px; height: 180px; flex-shrink: 0; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-250px * 6 - 120px)); }
-        }
 
         footer { background: #1a2533; color: white; padding: 80px 8% 40px; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
@@ -82,13 +99,14 @@
         .form-row { display: flex; gap: 10px; }
         .form-row div { flex: 1; display: flex; flex-direction: column; gap: 15px; }
 
+        .checkbox-container { display: flex; align-items: center; gap: 10px; margin-top: 5px; cursor: pointer; }
+        .checkbox-container input { width: auto; cursor: pointer; }
+        .checkbox-container span { font-size: 13px; color: var(--primary); font-weight: 500; }
+
         @media (max-width: 768px) { 
-            header { padding: 1rem 5%; justify-content: space-between; }
-            .nav-links { display: flex; gap: 12px; } 
-            .nav-links a:not([href="#contact"]) { display: none; } /* Oculta todo menos contacto */
+            header { padding: 1rem 5%; }
+            .nav-links a:not([href="#contact"]):not(#langBtn) { display: none; } 
             .hero h1 { font-size: 2.2rem; } 
-            .hero p { font-size: 1.4rem; } 
-            .logo { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -100,6 +118,7 @@
             <a href="#about" data-translate="nav-about">Nosotros</a>
             <a href="#services" data-translate="nav-services">Servicios</a>
             <a href="#contact" data-translate="nav-contact">Contacto</a>
+            <a href="#" onclick="openAuth()" data-translate="nav-register" style="color: var(--accent); font-weight: bold;">Registrate</a>
             <button class="btn btn-outline" style="padding: 5px 10px; border-radius: 5px; font-size: 11px;" onclick="toggleLanguage()" id="langBtn">English</button>
         </nav>
     </header>
@@ -108,20 +127,6 @@
         <h1>ODONTOCID</h1>
         <p id="hero-slogan">Creando sonrisas que <span class="highlight">inspiran</span></p>
         <button class="btn btn-primary" onclick="openBooking()" data-translate="btn-book-hero">Agendar Mi Cita Ahora</button>
-    </section>
-
-    <section id="about" class="container">
-        <div class="about-flex">
-            <div class="about-text">
-                <h2 class="section-title" style="text-align: left; left: 0; transform: none;" data-translate="about-title">Sobre Nosotros</h2>
-                <p data-translate="about-p1">En <strong>ODONTOCID</strong>, nos dedicamos a transformar vidas a través de la salud bucal. Somos un equipo de profesionales comprometidos con la excelencia, utilizando tecnología de punta en Santo Domingo Este.</p>
-                <br>
-                <p data-translate="about-p2">Nuestra misión es brindar una experiencia dental sin dolor, basada en la confianza y resultados estéticos duraderos para toda la familia.</p>
-            </div>
-            <div class="about-image">
-                <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800" alt="Clínica Dental">
-            </div>
-        </div>
     </section>
 
     <section id="services" style="background: #eceae5;">
@@ -144,22 +149,35 @@
         </div>
     </section>
 
-    <div class="slider-container">
-        <div class="slider-track">
-            <div class="slide"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400" alt="Consulta"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400" alt="Equipo"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Limpieza"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Resina"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Ortodoncia"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Radiografía"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=400" alt="Consulta"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1606811841689-23dfddce3e95?auto=format&fit=crop&w=400" alt="Equipo"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1571772996211-2f02c9727629?auto=format&fit=crop&w=400" alt="Limpieza"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1593054941018-0f52358f967a?auto=format&fit=crop&w=400" alt="Resina"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1468493858157-0da44aaf1d13?auto=format&fit=crop&w=400" alt="Ortodoncia"></div>
-            <div class="slide"><img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=400" alt="Radiografía"></div>
+    <section id="about" class="container" style="text-align: center;">
+        <div class="mv-grid">
+            <div class="mv-card">
+                <h3 data-translate="mision-t">Misión</h3>
+                <p data-translate="mision-p">Brindar servicios odontológicos de excelencia en Santo Domingo Este, utilizando tecnología de vanguardia y un enfoque humano para mejorar la calidad de vida y la confianza de nuestros pacientes a través de su sonrisa.</p>
+            </div>
+            <div class="mv-card">
+                <h3 data-translate="vision-t">Visión</h3>
+                <p data-translate="vision-p">Ser el referente clínico líder en salud dental de la zona oriental, reconocidos por nuestra ética profesional, innovación constante y por crear un entorno donde la salud bucal sea accesible y libre de temor para toda la familia.</p>
+            </div>
         </div>
-    </div>
+
+        <button class="btn btn-outline" onclick="toggleAbout()" data-translate="about-title" id="toggleBtn" style="font-size: 1.2rem; border-color: var(--accent); color: var(--accent);">Conoce a nuestra Fundadora</button>
+        
+        <div id="aboutContent">
+            <div class="about-flex">
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=800" alt="Dra. Arianni Cid">
+                </div>
+                <div class="about-text" style="text-align: left;">
+                    <p><strong style="color: var(--accent); font-size: 1.2rem;">Dra. Arianni Cid</strong></p>
+                    <br>
+                    <p data-translate="about-p1">Bajo la visión de la Dra. Cid, ODONTOCID nació con el propósito de elevar los estándares de la salud dental en Santo Domingo Este. Su enfoque combina la precisión clínica con un trato humano excepcional.</p>
+                    <br>
+                    <p data-translate="about-p2">Con años de experiencia transformando sonrisas, la Dra. Cid lidera un equipo comprometido con la innovación y el bienestar integral de cada paciente, asegurando que cada visita sea una experiencia positiva y sin estrés.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer id="contact">
         <div class="footer-grid container">
@@ -177,7 +195,7 @@
             <div class="footer-col">
                 <h4 data-translate="f-links">Enlaces</h4>
                 <a href="#about" data-translate="nav-about">Nosotros</a>
-                <a href="#" onclick="findUs()" data-translate="f-gps">Cómo llegar (GPS)</a>
+                <a href="https://www.google.com/maps?q=Calle+22+No.+4,+La+Esperanza,+SDE" target="_blank" data-translate="f-gps">Cómo llegar (GPS)</a>
                 <a href="https://wa.me/18495646095" target="_blank">WhatsApp Directo</a>
             </div>
         </div>
@@ -192,20 +210,29 @@
             <form id="bookingForm">
                 <label data-translate="m-name-label">Nombre Completo:</label>
                 <input type="text" id="name" data-translate-placeholder="m-name-ph" placeholder="Primer nombre y apellidos" required pattern="[A-Za-zñÑáéíóúÁÉÍÓÚ\s]+">
-                
-                <label data-translate="m-phone-label">WhatsApp:</label>
-                <input type="tel" id="phone" data-translate-placeholder="m-phone-ph" placeholder="WhatsApp (000) 000-0000" required>
-                
-                <label data-translate="m-id-label">Cédula:</label>
-                <input type="text" id="idCard" data-translate-placeholder="m-id-ph" placeholder="000-0000000-0" required>
-                
+                <div class="form-row">
+                    <div>
+                        <label data-translate="m-phone-label">Número de Teléfono:</label>
+                        <input type="tel" id="phone" data-translate-placeholder="m-phone-ph" placeholder="(000) 000-0000" required>
+                    </div>
+                    <div>
+                        <label data-translate="m-phone-type">Tipo de Teléfono:</label>
+                        <select id="phoneType">
+                            <option value="Celular" data-translate="opt-cell">Celular</option>
+                            <option value="Residencial" data-translate="opt-res">Residencial</option>
+                        </select>
+                    </div>
+                </div>
+                <label class="checkbox-container">
+                    <input type="checkbox" id="allowWhatsapp">
+                    <span data-translate="m-allow-ws">Contactarme por WhatsApp (Opcional)</span>
+                </label>
                 <label data-translate="m-doctor">Seleccione Doctor(a):</label>
                 <select id="doctorSelect">
                     <option value="Dra. Arianni Cid">Dra. Arianni Cid</option>
                     <option value="Dra. Sandra Alvarez">Dra. Sandra Alvarez</option>
                     <option value="Dr. Valentin Nova">Dr. Valentin Nova</option>
                 </select>
-
                 <label data-translate="m-service">Servicio:</label>
                 <select id="serviceSelect">
                     <option value="Limpieza / Profilaxis" data-translate="opt-1">Limpieza / Profilaxis</option>
@@ -213,7 +240,6 @@
                     <option value="Retenedores" data-translate="opt-4">Retenedores</option>
                     <option value="Odontología General" data-translate="opt-3">Odontología General</option>
                 </select>
-
                 <div class="form-row">
                     <div>
                         <label data-translate="m-date">Fecha:</label>
@@ -221,14 +247,14 @@
                     </div>
                     <div>
                         <label data-translate="m-time">Hora:</label>
-                        <input type="time" id="timeInput" required>
+                        <select id="timeInput" required disabled>
+                            <option value="" data-translate="m-select-date">Elige fecha primero</option>
+                        </select>
                     </div>
                 </div>
-
                 <button type="submit" class="btn btn-primary" data-translate="m-btn">Confirmar y Enviar</button>
                 <button type="button" class="btn btn-outline" onclick="closeBooking()" data-translate="m-cancel" style="width: 100%; margin-top: 5px;">Cancelar</button>
             </form>
-            
             <div id="success" style="display:none; text-align:center;">
                 <h2 style="color: #27ae60;">✅ <span data-translate="s-title">¡Enviado!</span></h2>
                 <p data-translate="s-p">Cerrando ventana automáticamente...</p>
@@ -236,123 +262,159 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <h2 style="color: var(--primary);" data-translate="auth-title">Crear Cuenta</h2>
+            <form id="authForm">
+                <label data-translate="auth-email">Correo Electrónico:</label>
+                <input type="email" placeholder="ejemplo@correo.com" required>
+                <label data-translate="auth-pass">Contraseña:</label>
+                <input type="password" placeholder="********" required minlength="6">
+                <button type="submit" class="btn btn-primary" data-translate="auth-btn">Registrarme Ahora</button>
+                <button type="button" class="btn btn-outline" onclick="closeAuth()" data-translate="m-cancel" style="width: 100%; margin-top: 5px;">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBrU6gTnIhpW22Zc2McV3tX48D_6WYWa4A",
+            authDomain: "odontocid.firebaseapp.com",
+            databaseURL: "https://odontocid-default-rtdb.firebaseio.com",
+            projectId: "odontocid",
+            storageBucket: "odontocid.firebasestorage.app",
+            messagingSenderId: "90949506964",
+            appId: "1:90949506964:web:6cb51c672a3432084f2181",
+            measurementId: "G-EC7V3C7E95"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function toggleAbout() {
+            const content = document.getElementById('aboutContent');
+            const btn = document.getElementById('toggleBtn');
+            content.classList.toggle('show');
+            if (content.classList.contains('show')) {
+                btn.innerText = lang === "es" ? "Cerrar información" : "Close information";
+            } else {
+                btn.innerText = lang === "es" ? "Conoce a nuestra Fundadora" : "Meet our Founder";
+            }
+        }
+
         const texts = {
             es: {
-                "nav-about": "Nosotros", "nav-services": "Servicios", "nav-contact": "Contacto",
-                "btn-book": "Reservar Cita", "hero-slogan": 'Creando sonrisas que <span class="highlight">inspiran</span>',
-                "btn-book-hero": "Agendar Mi Cita Ahora", "about-title": "Sobre Nosotros",
-                "about-p1": "En ODONTOCID, nos dedicamos a transformar vidas a través de la salud bucal. Somos un equipo de profesionales comprometidos con la excelencia, utilizando tecnología de punta en Santo Domingo Este.",
-                "about-p2": "Nuestra misión es brindar una experiencia dental sin dolor, basada en la confianza y resultados estéticos duraderos para toda la familia.",
-                "services-title": "Nuestros Servicios", 
-                "ser-1-t": "🪥 Odontología General", "ser-1-p": "Profilaxis (limpieza), extracciones, resinas y salud bucal preventiva.",
-                "ser-2-t": "🦷 Ortodoncia", "ser-2-p": "Brackets metálicos y estéticos para alinear tu sonrisa de forma perfecta.",
-                "ser-4-t": "💎 Retenedores", "ser-4-p": "Mantén tu sonrisa alineada después de los brackets con retenedores de alta calidad.",
-                "f-contact": "Contacto", "f-hours": "Horarios", "h-week": "Lunes - Viernes: 8am - 7pm",
-                "h-sat": "Sábados: 9am - 2pm", "f-links": "Enlaces",
-                "f-gps": "Cómo llegar (GPS)", "f-rights": "Todos los derechos reservados.",
-                "m-title": "Agendar Cita", "m-doctor": "Seleccione Doctor(a):", "m-service": "Servicio:",
+                "nav-about": "Nosotros", "nav-services": "Servicios", "nav-contact": "Contacto", "nav-register": "Regístrate",
+                "btn-book-hero": "Agendar Mi Cita Ahora", 
+                "about-title": "Conoce a nuestra Fundadora",
+                "about-p1": "Bajo la visión de la Dra. Cid, ODONTOCID nació con el propósito de elevar los estándares de la salud dental en Santo Domingo Este. Su enfoque combina la precisión clínica con un trato humano excepcional.",
+                "about-p2": "Con años de experiencia transformando sonrisas, la Dra. Cid lidera un equipo comprometido con la innovación y el bienestar integral de cada paciente.",
+                "mision-t": "Misión", "mision-p": "Brindar servicios odontológicos de excelencia en Santo Domingo Este, utilizando tecnología de vanguardia y un enfoque humano.",
+                "vision-t": "Visión", "vision-p": "Ser el referente clínico líder en salud dental de la zona oriental, reconocidos por nuestra ética profesional e innovación constante.",
+                "services-title": "Nuestros Servicios", "f-contact": "Contacto", "f-hours": "Horarios", "h-week": "Lunes - Viernes: 8am - 7pm", "h-sat": "Sábados: 9am - 2pm",
+                "f-links": "Enlaces", "f-gps": "Cómo llegar (GPS)", "f-rights": "Todos los derechos reservados",
+                "m-title": "Agendar Cita", "m-doctor": "Doctor(a):", "m-service": "Servicio:",
                 "m-date": "Fecha:", "m-time": "Hora:", "m-name-ph": "Primer nombre y apellidos",
-                "m-phone-ph": "WhatsApp (000) 000-0000", "m-id-ph": "000-0000000-0",
-                "m-name-label": "Nombre Completo:", "m-phone-label": "WhatsApp:", "m-id-label": "Cédula:",
-                "m-btn": "Confirmar y Enviar", "m-cancel": "Cancelar", "s-title": "¡Enviado!", "s-p": "Cerrando ventana...",
+                "m-phone-ph": "(000) 000-0000", "m-name-label": "Nombre Completo:", "m-phone-label": "Número de Teléfono:",
+                "m-phone-type": "Tipo de Teléfono:", "opt-cell": "Celular", "opt-res": "Residencial", "m-allow-ws": "Contactarme por WhatsApp (Opcional)",
+                "m-btn": "Confirmar y Enviar", "m-cancel": "Cancelar", "s-title": "¡Enviado!", "s-p": "Cerrando ventana automáticamente...",
                 "opt-1": "Limpieza / Profilaxis", "opt-2": "Evaluación Brackets", "opt-3": "Odontología General", "opt-4": "Retenedores",
-                "ws-patient": "Paciente", "ws-id": "Cédula", "ws-doctor": "Doctor", "ws-service": "Servicio", "ws-date": "Fecha", "ws-time": "Hora"
+                "m-select-date": "Elige fecha primero", "auth-title": "Crear Cuenta", "auth-btn": "Registrarme Ahora"
             },
             en: {
-                "nav-about": "About Us", "nav-services": "Services", "nav-contact": "Contact",
-                "btn-book": "Book Online", "hero-slogan": 'Creating smiles that <span class="highlight">inspire</span>',
-                "btn-book-hero": "Book My Appointment Now", "about-title": "About Us",
-                "about-p1": "At ODONTOCID, we are dedicated to transforming lives through oral health. We are a team of professionals committed to excellence, using cutting-edge technology in Santo Domingo Este.",
-                "about-p2": "Our mission is to provide a pain-free dental experience, based on trust and lasting aesthetic results for the whole family.",
-                "services-title": "Our Services", 
-                "ser-1-t": "🪥 General Dentistry", "ser-1-p": "Prophylaxis (cleaning), extractions, fillings, and preventive oral health.",
-                "ser-2-t": "🦷 Orthodontics", "ser-2-p": "Metal and aesthetic brackets to align your smile perfectly.",
-                "ser-4-t": "💎 Retainers", "ser-4-p": "Keep your smile aligned after brackets with high-quality retainers.",
-                "f-contact": "Contact", "f-hours": "Working Hours", "h-week": "Mon - Fri: 8am - 7pm",
-                "h-sat": "Saturdays: 9am - 2pm", "f-links": "Links",
-                "f-gps": "Get Directions (GPS)", "f-rights": "All rights reserved.",
-                "m-title": "Book Appointment", "m-doctor": "Select Doctor:", "m-service": "Service:",
-                "m-date": "Date:", "m-time": "Time:", "m-name-ph": "First name and last names",
-                "m-phone-ph": "WhatsApp (000) 000-0000", "m-id-ph": "000-0000000-0",
-                "m-name-label": "Full Name:", "m-phone-label": "WhatsApp:", "m-id-label": "ID/SSN:",
-                "m-btn": "Confirm & Send", "m-cancel": "Cancel", "s-title": "Sent!", "s-p": "Closing window...",
-                "opt-1": "Cleaning / Prophylaxis", "opt-2": "Brackets Evaluation", "opt-3": "General Dentistry", "opt-4": "Retainers",
-                "ws-patient": "Patient", "ws-id": "ID", "ws-doctor": "Doctor", "ws-service": "Service", "ws-date": "Date", "ws-time": "Time"
+                "nav-about": "About", "nav-services": "Services", "nav-contact": "Contact", "nav-register": "Register",
+                "btn-book-hero": "Book Now", 
+                "about-title": "Meet our Founder",
+                "about-p1": "Under Dra. Cid's vision, ODONTOCID was born to raise dental health standards in Santo Domingo Este.",
+                "about-p2": "With years of experience, Dra. Cid leads a team committed to innovation and patient well-being.",
+                "mision-t": "Mission", "mision-p": "To provide dental excellence in Santo Domingo Este, using state-of-the-art technology and a human focus.",
+                "vision-t": "Vision", "vision-p": "To be the leading clinical reference in dental health in the eastern area, known for professional ethics and constant innovation.",
+                "services-title": "Our Services", "f-contact": "Contact", "f-hours": "Hours", "h-week": "Mon-Fri: 8am-7pm", "h-sat": "Sat: 9am-2pm",
+                "f-links": "Links", "f-gps": "Get Directions (GPS)", "f-rights": "All rights reserved",
+                "m-title": "Book Appointment", "m-doctor": "Doctor:", "m-service": "Service:",
+                "m-date": "Date:", "m-time": "Time:", "m-name-ph": "Full Name",
+                "m-phone-ph": "(000) 000-0000", "m-name-label": "Full Name:", "m-phone-label": "Phone Number:",
+                "m-phone-type": "Phone Type:", "opt-cell": "Mobile", "opt-res": "Landline", "m-allow-ws": "Contact me via WhatsApp (Optional)",
+                "m-btn": "Confirm and Send", "m-cancel": "Cancel", "s-title": "Sent!", "s-p": "Closing window automatically...",
+                "opt-1": "Cleaning / Prophylaxis", "opt-2": "Braces Evaluation", "opt-3": "General Dentistry", "opt-4": "Retainers",
+                "m-select-date": "Select date first", "auth-title": "Create Account", "auth-btn": "Register Now"
             }
+        };
+
+        const slots = ["08:00", "09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
+
+        document.getElementById('dateInput').addEventListener('change', function(e) {
+            const date = e.target.value;
+            const timeSelect = document.getElementById('timeInput');
+            timeSelect.innerHTML = '<option>Cargando...</option>';
+            timeSelect.disabled = true;
+            database.ref('citas/' + date).once('value', (snap) => {
+                const booked = snap.val() || {};
+                timeSelect.innerHTML = lang === "es" ? '<option value="">Selecciona hora</option>' : '<option value="">Select time</option>';
+                slots.forEach(s => {
+                    const timeId = s.replace(':', '');
+                    const isBooked = booked[timeId];
+                    const opt = document.createElement('option');
+                    opt.value = s;
+                    opt.text = isBooked ? s + (lang === "es" ? " (Ocupado)" : " (Booked)") : s;
+                    opt.disabled = isBooked;
+                    timeSelect.appendChild(opt);
+                });
+                timeSelect.disabled = false;
+            });
+        });
+
+        document.getElementById('bookingForm').onsubmit = (e) => {
+            e.preventDefault();
+            const date = document.getElementById('dateInput').value;
+            const time = document.getElementById('timeInput').value;
+            const name = document.getElementById('name').value;
+            const doctor = document.getElementById('doctorSelect').value;
+            const service = document.getElementById('serviceSelect').value;
+            const wantsWhatsapp = document.getElementById('allowWhatsapp').checked;
+            const timeId = time.replace(':', '');
+            database.ref('citas/' + date + '/' + timeId).set({
+                paciente: name, servicio: service, doctor: doctor, fecha_registro: new Date().toLocaleString()
+            }).then(() => {
+                if (wantsWhatsapp) {
+                    const num = doctor === "Dra. Sandra Alvarez" ? "18492581598" : "18495646095";
+                    const msg = `*Nueva Cita*%0A*Paciente:* ${name}%0A*Fecha:* ${date}%0A*Hora:* ${time}%0A*Servicio:* ${service}%0A*Doctor:* ${doctor}`;
+                    window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
+                }
+                document.getElementById('bookingForm').style.display = 'none';
+                document.getElementById('success').style.display = 'block';
+                setTimeout(() => location.reload(), 3000);
+            });
         };
 
         let lang = "es";
         function toggleLanguage() {
             lang = lang === "es" ? "en" : "es";
             document.getElementById('langBtn').innerText = lang === "es" ? "English" : "Español";
-            document.getElementById('hero-slogan').innerHTML = texts[lang]["hero-slogan"];
-            document.querySelectorAll('[data-translate]').forEach(el => el.innerHTML = texts[lang][el.getAttribute('data-translate')]);
-            document.querySelectorAll('[data-translate-placeholder]').forEach(el => el.placeholder = texts[lang][el.getAttribute('data-translate-placeholder')]);
+            document.querySelectorAll('[data-translate]').forEach(el => {
+                el.innerHTML = texts[lang][el.getAttribute('data-translate')];
+            });
+            document.querySelectorAll('[data-translate-placeholder]').forEach(el => {
+                el.placeholder = texts[lang][el.getAttribute('data-translate-placeholder')];
+            });
+            const content = document.getElementById('aboutContent');
+            const btn = document.getElementById('toggleBtn');
+            if (content.classList.contains('show')) {
+                btn.innerText = lang === "es" ? "Cerrar información" : "Close information";
+            } else {
+                btn.innerText = lang === "es" ? "Conoce a nuestra Fundadora" : "Meet our Founder";
+            }
         }
 
-        const nameInput = document.getElementById('name');
-        nameInput.addEventListener('input', (e) => e.target.value = e.target.value.replace(/[^A-Za-zñÑáéíóúÁÉÍÓÚ\s]/g, ''));
-
-        const idInput = document.getElementById('idCard');
-        idInput.addEventListener('input', function(e) {
-            let val = e.target.value.replace(/\D/g, ''); 
-            let masked = "";
-            if (val.length > 0) {
-                masked += val.substring(0, 3);
-                if (val.length > 3) {
-                    masked += "-" + val.substring(3, 10);
-                    if (val.length > 10) {
-                        masked += "-" + val.substring(10, 11);
-                    }
-                }
-            }
-            e.target.value = masked;
-        });
-
-        const phoneInput = document.getElementById('phone');
-        phoneInput.addEventListener('input', function (e) {
+        function openBooking() { document.getElementById('modal').style.display = 'flex'; }
+        function closeBooking() { document.getElementById('modal').style.display = 'none'; }
+        function openAuth() { document.getElementById('authModal').style.display = 'flex'; }
+        function closeAuth() { document.getElementById('authModal').style.display = 'none'; }
+        
+        document.getElementById('phone').addEventListener('input', function (e) {
             let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
             e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
         });
-
-        function findUs() {
-            const address = "Calle 22 No. 4, La Esperanza, Santo Domingo Este, Republica Dominicana";
-            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
-        }
-
-        const modal = document.getElementById('modal');
-        const bookingForm = document.getElementById('bookingForm');
-
-        function openBooking() { modal.style.display = 'flex'; }
-        function closeBooking() { 
-            modal.style.display = 'none';
-            document.getElementById('success').style.display = 'none';
-            bookingForm.style.display = 'flex';
-            bookingForm.reset();
-        }
-
-        modal.addEventListener('click', (e) => { if (e.target === modal) closeBooking(); });
-        document.addEventListener('keydown', (e) => { if (e.key === "Escape" && modal.style.display === 'flex') closeBooking(); });
-
-        bookingForm.onsubmit = (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const idCard = document.getElementById('idCard').value;
-            const doctor = document.getElementById('doctorSelect').value;
-            const service = document.getElementById('serviceSelect').options[document.getElementById('serviceSelect').selectedIndex].text;
-            const date = document.getElementById('dateInput').value;
-            const time = document.getElementById('timeInput').value;
-            
-            let num = doctor === "Dra. Sandra Alvarez" ? "18492581598" : "18495646095";
-            let msg = `Cita ODONTOCID:%0A*${texts[lang]["ws-patient"]}:* ${name}%0A*${texts[lang]["ws-id"]}:* ${idCard}%0A*WhatsApp:* ${phone}%0A*${texts[lang]["ws-doctor"]}:* ${doctor}%0A*${texts[lang]["ws-service"]}:* ${service}%0A*${texts[lang]["ws-date"]}:* ${date}%0A*${texts[lang]["ws-time"]}:* ${time}`;
-            
-            window.open(`https://wa.me/${num}?text=${msg}`, '_blank');
-            bookingForm.style.display = 'none';
-            document.getElementById('success').style.display = 'block';
-            setTimeout(closeBooking, 5000);
-        };
     </script>
 </body>
 </html>
